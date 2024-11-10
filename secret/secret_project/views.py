@@ -1,7 +1,7 @@
-from django.shortcuts import render
-from rest_framework import filters, status, viewsets
-from django.shortcuts import get_object_or_404
-#from rest_framework.permissions import Allowany
+import hashlib
+import base64
+
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,60 +9,41 @@ from .models import Secret
 from .serializers import SecretSerializer, GenerateSerializer
 
 
-class GenerateViewSet(viewsets.ModelViewSet):
+class GenerateAPIView(APIView):
+    """secret: viewset создания записи."""
 
-    serializer_class = GenerateSerializer
-    http_method_names = ('post',)
-
-    # def perform_create(self, serializer):
-    #     """Создать отзыв к title_id."""
-    #     secret_key = '222'
-
-    #     serializer.save(
-    #         secret_key=secret_key)
-        
-    def create(self, request, *args, **kwargs):
-        """Переопределяем метод создания для возврата secret_key."""
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request):
+        """Создание записи и возврат ссылки на запись."""
+        serializer = GenerateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
 
+        # хешируем ссылку по id записи
+        hash_object = hashlib.sha256(str(instance.id).encode())
+        hash_bytes = hash_object.digest()
+        encoded_hash = base64.urlsafe_b64encode(hash_bytes).decode('utf-8')
+        hashed_link = encoded_hash.rstrip('=')
+        secret_key = hashed_link
 
-        # Возвращаем только secret_key вместо стандартного ответа
-        secret_key = '333'
-        serializer.save(
-            secret_key=secret_key)
-        return Response({"secret_key": secret_key}, status=status.HTTP_201_CREATED)
+        instance.secret_key = secret_key
+        instance.save()
 
-
-# class SecretsViewSet(viewsets.ModelViewSet):
-
-#     queryset = Secret.objects.all()
-#     serializer_class = SecretSerializer
-#     http_method_names = ['get', ]
-#     #lookup_field = "id"
-
-#     def retrieve(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         return Response(self.serializer_class(instance).data,
-#                         status=status.HTTP_200_OK)
+        return Response({"secret_key": secret_key},
+                        status=status.HTTP_201_CREATED)
 
 
 class SecretsAPIView(APIView):
+    """secret: viewset выдачи и удаления записи."""
 
     def post(self, request, key):
-        # Используем ключ для поиска объекта
-        try:
-            secret = Secret.objects.get(id=key)  # Предполагается, что ключ - это id объекта
-        except Secret.DoesNotExist:
-            return Response({'error': 'Секрет не найден'}, status=status.HTTP_404_NOT_FOUND)
+        """Возврат секрета и удаления записи."""
+        serializer = SecretSerializer(data=request.data,
+                                      context={'secret_key': key})
 
-        serializer = SecretSerializer(secret, data=request.data)
-        
         if serializer.is_valid():
             secret = serializer.validated_data['secret']
+            Secret.objects.filter(secret_key=key).delete()
             return Response({'secret': secret})
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #def delete(self, request):
-    
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
