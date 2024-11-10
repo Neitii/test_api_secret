@@ -11,10 +11,30 @@ from rest_framework.serializers import ModelSerializer
 from .models import Secret
 
 
-class SecretSerializer(serializers.ModelSerializer):
+class GenerateSerializer(serializers.ModelSerializer):
     """api_foodgram: сериализатор секретов"""
 
     class Meta:
 
         model = Secret
         exclude = ("pub_date", "secret_key")
+
+
+class SecretSerializer(serializers.ModelSerializer):
+    """api_foodgram: сериализатор секретов"""
+
+    def validate(self, data):
+        passphrase = data.get('passphrase')
+        secret_key = data.get('secret_key')
+        try:
+            secret = Secret.objects.get(passphrase=passphrase, secret_key=secret_key)
+        except Secret.DoesNotExist:
+            raise serializers.ValidationError('Не верно')
+
+        data['secret'] = secret.secret
+        return data
+  
+    class Meta:
+
+        model = Secret
+        fields = ("passphrase", "secret_key")
