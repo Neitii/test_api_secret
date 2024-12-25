@@ -23,7 +23,7 @@ class GenerateAPIView(APIView):
         hash_bytes = hash_object.digest()
         encoded_hash = base64.urlsafe_b64encode(hash_bytes).decode('utf-8')
         hashed_link = encoded_hash.rstrip('=')
-        secret_key = hashed_link
+        secret_key = hashed_link[:10]
 
         instance.secret_key = secret_key
         instance.save()
