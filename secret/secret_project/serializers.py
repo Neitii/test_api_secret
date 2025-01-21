@@ -9,7 +9,7 @@ class GenerateSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = Secret
-        exclude = ("pub_date", "secret_key")
+        exclude = ("pub_date", "secret_key")#, "secret", "passphrase")
 
 
 class SecretSerializer(serializers.ModelSerializer):

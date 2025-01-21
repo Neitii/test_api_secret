@@ -17,14 +17,16 @@ services:
     depends_on:
       - db
     volumes:
-      - static:/static
+      - static:/backend_static
 
   gateway:
     build: ./nginx/
     env_file: .env
     depends_on:
       - backend 
+    # volumes:
+    #   - static_value:/var/html/static
     volumes:
-      - static:/static
+      - static:/staticfiles/
     ports:
       - 8000:80
