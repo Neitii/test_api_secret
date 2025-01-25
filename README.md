@@ -65,7 +65,7 @@ docker-compose exec backend python manage.py createsuperuser
 
 6. Команда для выполнения тестов:
 ```sh
-docker-compose exec backend python pytest
+docker-compose exec backend python -m pytest -v   
 ```
 
 
@@ -80,7 +80,7 @@ POST /generate/
 ```sh
 {
   "secret": "надо было тогда не так сказать",
-  "passphrase": "мысли перед сном",
+  "passphrase": "мысли перед сном"
 }
 ```
 
@@ -94,7 +94,7 @@ POST /generate/
 ```
 
 
-Для получения секрета отправить POST-запрос на соответвующий secret_key, запрос можно сделать только один раз:
+Для получения секрета отправить POST-запрос на соответвующий secret_key, запрос можно сделать только один:
 
 ```
 POST secrets/abrakadabra/
