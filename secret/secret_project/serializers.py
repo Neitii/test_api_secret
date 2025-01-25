@@ -9,7 +9,7 @@ class GenerateSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = Secret
-        exclude = ("pub_date", "secret_key")#, "secret", "passphrase")
+        exclude = ("pub_date", "secret_key")
 
 
 class SecretSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class SecretSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Валидация фразы и кода."""
         passphrase = data.get('passphrase')
-        secret_key = self.context.get('secret_key')  
+        secret_key = self.context.get('secret_key')
         try:
             secret = Secret.objects.get(passphrase=passphrase,
                                         secret_key=secret_key)

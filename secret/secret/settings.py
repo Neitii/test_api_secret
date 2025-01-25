@@ -57,6 +57,7 @@ WSGI_APPLICATION = 'secret.wsgi.application'
 
 
 USE_SQLITE = os.getenv('USE_SQLITE', 'False').lower() == 'true'
+print("fffffffff", USE_SQLITE)
 
 # if USE_SQLITE:
 #     DATABASES = {
@@ -87,6 +88,8 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', 5432)
     }
 }
+
+print("aaaaaaaaaaa", os.getenv('POSTGRES_DB'))
 
 
 # Password validation

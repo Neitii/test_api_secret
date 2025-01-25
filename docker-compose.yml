@@ -24,8 +24,6 @@ services:
     env_file: .env
     depends_on:
       - backend 
-    # volumes:
-    #   - static_value:/var/html/static
     volumes:
       - static:/staticfiles/
     ports:
