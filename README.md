@@ -23,7 +23,7 @@
 1. Клонируйте репозиторий на свой компьютер:
 
     ```bash
-    git clone ССЫЛКА
+    git clone https://github.com/Neitii/test_secret
     ```
     ```bash
     cd testovoe
